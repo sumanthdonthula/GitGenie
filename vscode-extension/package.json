@@ -1,0 +1,138 @@
+{
+  "name": "git-genie",
+  "displayName": "Git Genie — Your Git Companion",
+  "description": "Rub the lamp. A little genie watches your local Git branch and warns when changes overlap.",
+  "version": "0.3.0",
+  "repository": { "type": "git", "url": "https://github.com/sumanthdonthula/GitGenie.git" },
+  "homepage": "https://github.com/sumanthdonthula/GitGenie#readme",
+  "bugs": { "url": "https://github.com/sumanthdonthula/GitGenie/issues" },
+  "publisher": "gitgenie-local",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "SCM Providers"
+  ],
+  "keywords": [
+    "git",
+    "genie",
+    "companion",
+    "rebase",
+    "conflicts"
+  ],
+  "main": "./src/extension.js",
+  "icon": "media/icon.png",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "The lamp and demo work in Restricted Mode. Git analysis waits until you trust the workspace."
+    },
+    "virtualWorkspaces": false
+  },
+  "contributes": {
+    "commands": [
+      { "command": "gitgenie.pullAndRebase", "title": "Git Genie: Pull & Rebase", "icon": "$(sync)" },
+      { "command": "gitgenie.continueRebase", "title": "Git Genie: Continue Rebase" },
+      { "command": "gitgenie.abortRebase", "title": "Git Genie: Abort Rebase" },
+      {
+        "command": "gitgenie.summon",
+        "title": "Git Genie: Rub the Lamp",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "gitgenie.refresh",
+        "title": "Git Genie: Check Local Changes",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "gitgenie.demo",
+        "title": "Git Genie: Try the Genie Demo"
+      },
+      {
+        "command": "gitgenie.chooseRepository",
+        "title": "Git Genie: Choose Repository"
+      },
+      {
+        "command": "gitgenie.chooseBase",
+        "title": "Git Genie: Choose Comparison Branch"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gitgenie",
+          "title": "Git Genie",
+          "icon": "media/lamp.svg"
+        }
+      ]
+    },
+    "views": {
+      "gitgenie": [
+        {
+          "type": "webview",
+          "id": "gitgenie.companion",
+          "name": "Your Genie",
+          "icon": "media/lamp.svg"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "gitgenie.summon",
+          "when": "view == gitgenie.companion",
+          "group": "navigation@1"
+        },
+        {
+          "command": "gitgenie.refresh",
+          "when": "view == gitgenie.companion",
+          "group": "navigation@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Git Genie",
+      "properties": {
+        "gitgenie.baseBranch": {
+          "type": "string",
+          "default": "",
+          "description": "Comparison branch. Empty prefers the configured remote main/master, then local main/master.",
+          "scope": "resource"
+        },
+        "gitgenie.autoReveal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Reveal the genie when a new overlapping change is detected."
+        },
+        "gitgenie.animations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Animate the lamp, smoke, and genie. System reduced-motion preferences are also respected."
+        },
+        "gitgenie.remote": {
+          "type": "string", "default": "origin", "scope": "resource",
+          "description": "Default remote for background fetching and for comparison branches without a remote upstream."
+        },
+        "gitgenie.autoFetch": {
+          "type": "boolean", "default": true, "scope": "resource",
+          "description": "Fetch the configured remote on startup and every five minutes. Fetching never rebases or changes your local branches."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "node --test test/git.test.js test/sync.test.js",
+    "test:webview": "node test/webview.test.js",
+    "test:host": "node test/run-host.js",
+    "package": "vsce package --out ../artifacts/git-genie-0.3.0.vsix"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^4.1.0",
+    "playwright-core": "^1.65.0"
+  }
+}

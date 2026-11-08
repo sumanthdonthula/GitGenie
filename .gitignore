@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+*.egg-info/
+.demo/
+.pytest_cache/
+node_modules/
+.npm-cache/
+.vscode-test/
+*.vsix
+simulations/
+debug.log
+!artifacts/git-genie-0.3.0.vsix
+artifacts/real-git-simulation-*.json
+artifacts/real-git-simulation-*.md
