@@ -6,7 +6,7 @@ Git Genie is an animated Git companion inside VS Code. Rub the golden lamp: it b
 
 ## Why use it?
 
-You should not need to repeatedly pull main to discover whether someone touched your code. Genie fetches your configured remote on startup and every five minutes and checks your branch every 10 seconds and shortly after saves. Fetching updates remote tracking refs without changing your local branches.
+You should not need to repeatedly pull main to discover whether someone touched your code. Genie fetches your configured remote on startup and every 30 seconds and checks your branch every 10 seconds and shortly after saves. Fetching updates remote tracking refs without changing your local branches.
 
 Review the overlap and click **Pull & Rebase** when ready. Genie fetches the selected remote base, usually `origin/main`, and rebases your current branch onto it. You do not have to check out or pull local main first.
 
@@ -16,7 +16,7 @@ Requires VS Code 1.85+ and Git 2.38+. No Python, AI service, or account is requi
 
 1. Download the VSIX from the [Git Genie repository](https://github.com/sumanthdonthula/GitGenie).
 2. Open the Command Palette and run **Extensions: Install from VSIX…**.
-3. Select `git-genie-0.3.0.vsix` and reload the window if prompted.
+3. Select `git-genie-0.3.1.vsix` and reload the window if prompted.
 4. Open a Git project and click the **lamp** in the Activity Bar.
 
 The companion opens on first activation. Summon it later with **Git Genie: Rub the Lamp**, or **Genie** in the status bar. Move **Your Genie** to the **Secondary Side Bar** if you prefer it on the right. The Activity Bar icon is static; the lamp/smoke animation runs inside the side panel.
@@ -41,7 +41,7 @@ If conflicts occur, resolve and stage the files in Source Control, then click **
 
 - `gitgenie.baseBranch`: comparison base; automatically prefers remote main/master, then local main/master.
 - `gitgenie.remote`: remote for background fetching, defaults to `origin`.
-- `gitgenie.autoFetch`: startup and five-minute fetches, enabled by default. Disable for offline use.
+- `gitgenie.autoFetch`: startup and 30-second fetches, enabled by default. Disable for offline use.
 - `gitgenie.autoReveal`: reveal on new overlaps, enabled by default.
 - `gitgenie.animations`: animation, enabled by default; system reduced-motion preferences also apply.
 

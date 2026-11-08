@@ -2,7 +2,7 @@
   "name": "git-genie",
   "displayName": "Git Genie — Your Git Companion",
   "description": "Rub the lamp. A little genie watches your local Git branch and warns when changes overlap.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "repository": { "type": "git", "url": "https://github.com/sumanthdonthula/GitGenie.git" },
   "homepage": "https://github.com/sumanthdonthula/GitGenie#readme",
   "bugs": { "url": "https://github.com/sumanthdonthula/GitGenie/issues" },
@@ -120,7 +120,7 @@
         },
         "gitgenie.autoFetch": {
           "type": "boolean", "default": true, "scope": "resource",
-          "description": "Fetch the configured remote on startup and every five minutes. Fetching never rebases or changes your local branches."
+          "description": "Fetch the configured remote on startup and every 30 seconds. Fetching never rebases or changes your local branches."
         }
       }
     }
@@ -129,7 +129,7 @@
     "test": "node --test test/git.test.js test/sync.test.js",
     "test:webview": "node test/webview.test.js",
     "test:host": "node test/run-host.js",
-    "package": "vsce package --out ../artifacts/git-genie-0.3.0.vsix"
+    "package": "vsce package --out ../artifacts/git-genie-0.3.1.vsix"
   },
   "devDependencies": {
     "@vscode/vsce": "^4.1.0",

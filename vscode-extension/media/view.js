@@ -82,7 +82,7 @@ function render(state) {
   for (const id of ['refresh', 'repository', 'base', 'demo']) byId(id).disabled = Boolean(sync.busy);
   text('snooze', state.snoozed ? 'Resume' : 'Snooze');
   byId('snooze').onclick = () => send(state.snoozed ? 'resume' : 'snooze');
-  text('watch-status', demo ? 'Sample data · your repository is unchanged' : state.snoozed ? 'Alerts paused for 15m · checks continue' : state.fetchInfo?.enabled ? 'Checks every 10s · fetch every 5m' : 'Checks every 10s · automatic fetch off');
+  text('watch-status', demo ? 'Sample data · your repository is unchanged' : state.snoozed ? 'Alerts paused for 15m · checks continue' : state.fetchInfo?.enabled ? 'Checks every 10s · fetch every 30s' : 'Checks every 10s · automatic fetch off');
   if (state.fetchInfo?.error && !demo && !sync.message) {
     text('sync-message', state.fetchInfo.error);
     byId('sync-message').hidden = false;

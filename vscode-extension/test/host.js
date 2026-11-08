@@ -6,8 +6,8 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { Git } = require('../src/git');
 
-async function until(check, label) {
-  const end = Date.now() + 30000;
+async function until(check, label, timeout = 30000) {
+  const end = Date.now() + timeout;
   while (Date.now() < end) {
     const result = check();
     if (result) return result;
@@ -35,6 +35,11 @@ async function run() {
   assert.deepEqual(state.snapshot.overlaps[0].authors, ['dev-2']);
   assert.equal(state.sync.target, 'origin/main');
   assert.equal(state.fetchInfo.enabled, true);
+  const firstFetch = state.fetchInfo.lastFetch;
+  assert.ok(firstFetch, 'Startup fetch must complete');
+  await until(() => api.getState().fetchInfo.lastFetch !== firstFetch,
+    'a second automatic fetch on the 30-second cadence', 45000);
+  console.log('30-second background fetch verified against a real local remote.');
   const repo = state.snapshot.root;
   const git = new Git(repo);
   const originalHead = (await git.run(['rev-parse', 'HEAD'])).trim();

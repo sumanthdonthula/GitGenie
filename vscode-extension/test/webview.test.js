@@ -55,8 +55,10 @@ async function main() {
     await page.evaluate(state => window.postMessage(state, '*'), live);
     await page.locator('#sync').click();
     assert.ok(await page.evaluate(() => window.__messages.some(m => m.type === 'sync')));
+    assert.match(await page.locator('#watch-status').innerText(), /fetch every 30s/);
     assert.match(await page.locator('#sync-target').innerText(), /origin\/main/);
     await page.evaluate(state => window.postMessage(state, '*'), { ...live, sync: { ...live.sync, busy: true } });
+    await page.waitForFunction(() => document.getElementById('sync').disabled);
     assert.equal(await page.locator('#sync').isDisabled(), true);
     await page.evaluate(state => window.postMessage(state, '*'), { ...live, sync: { ...live.sync, paused: true, message: 'Resolve and stage the conflicts.' } });
     await page.locator('#continueRebase').click();

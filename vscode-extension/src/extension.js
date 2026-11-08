@@ -9,7 +9,7 @@ const { syncPlan, pullAndRebase, resumeRebase, operationState, fetchRemote } = r
 
 const VIEW = 'gitgenie.companion';
 const SCAN_MS = 10000;
-const FETCH_MS = 300000;
+const FETCH_MS = 30000;
 
 class Companion {
   constructor(context) {

@@ -21,7 +21,7 @@ Click the lamp for the animation, or let a new overlap summon your genie automat
 
 ## Why is this useful to me?
 
-You should not need to repeatedly pull main just to discover whether a teammate touched the code you are editing. Genie fetches remote updates on startup and every **five minutes**, then checks your branch every **10 seconds** and shortly after saves. Fetching updates your view of the remote without changing your local branch or working files.
+You should not need to repeatedly pull main just to discover whether a teammate touched the code you are editing. Genie fetches remote updates on startup and every **30 seconds**, then checks your branch every **10 seconds** and shortly after saves. Fetching updates your view of the remote without changing your local branch or working files.
 
 For example, you add free shipping while dev-2 changes the shipping fee. Genie points out that both changes touch the same calculation before you try to integrate them. When you are ready, click **Pull & Rebase** instead of manually pulling the base branch and rebasing your feature branch.
 
@@ -31,7 +31,7 @@ It helps you stay aware, choose when to sync, and understand which files need at
 
 You need **VS Code 1.85+** and **Git 2.38+**. Existing Git authentication must work for remote fetches. This is a VSIX installation; the extension is not published on the Marketplace yet.
 
-1. Download [`git-genie-0.3.0.vsix`](artifacts/git-genie-0.3.0.vsix). On GitHub, use the file's **Download raw file** control.
+1. Download [`git-genie-0.3.1.vsix`](artifacts/git-genie-0.3.1.vsix). On GitHub, use the file's **Download raw file** control.
 2. Open VS Code and press **Ctrl+Shift+P** (or **Cmd+Shift+P** on macOS).
 3. Run **Extensions: Install from VSIX…** and select the downloaded file.
 4. If VS Code asks, run **Developer: Reload Window**.
@@ -40,7 +40,7 @@ You need **VS Code 1.85+** and **Git 2.38+**. Existing Git authentication must w
 From a local checkout, you can also double-click `Install-Extension.cmd` on Windows or run:
 
 ```powershell
-code --install-extension ./artifacts/git-genie-0.3.0.vsix
+code --install-extension ./artifacts/git-genie-0.3.1.vsix
 ```
 
 The companion opens on its first activation. You can summon it any time with **Git Genie: Rub the Lamp** from the Command Palette or **Genie** in the status bar. To put it on the right, right-click **Your Genie** and move the view to the **Secondary Side Bar**.
@@ -87,7 +87,7 @@ Rebasing can change local commit IDs. Genie does not push, force-push, auto-reso
 | --- | --- | --- |
 | `gitgenie.baseBranch` | Automatic | Prefer the configured remote's main/master, then local main/master |
 | `gitgenie.remote` | `origin` | Remote used for background fetching and branches without a remote upstream |
-| `gitgenie.autoFetch` | `true` | Fetch on startup and every five minutes; disable for offline use |
+| `gitgenie.autoFetch` | `true` | Fetch on startup and every 30 seconds; disable for offline use |
 | `gitgenie.autoReveal` | `true` | Reveal the genie when a new overlap appears |
 | `gitgenie.animations` | `true` | Animate the lamp, smoke, and genie; system reduced-motion preferences also apply |
 
@@ -115,7 +115,7 @@ npm test
 npm run package
 ```
 
-The package is written to `artifacts/git-genie-0.3.0.vsix` in the repository root. Runtime code uses only VS Code and Node built-ins; npm dependencies are development tools. Open the root project and launch **Git Genie Extension** from Run and Debug for an Extension Development Host.
+The package is written to `artifacts/git-genie-0.3.1.vsix` in the repository root. Runtime code uses only VS Code and Node built-ins; npm dependencies are development tools. Open the root project and launch **Git Genie Extension** from Run and Debug for an Extension Development Host.
 
 Additional checks are available with `npm run test:webview` and `npm run test:host`. The UI harnesses currently use locally installed Chrome and VS Code on Windows. Git integration tests use disposable repositories and local bare remotes, including successful sync, dirty-tree rejection, conflict continuation/abort, and failed fetches.
 

@@ -13,5 +13,6 @@ node_modules/
 simulations/
 debug.log
 !artifacts/git-genie-0.3.0.vsix
+!artifacts/git-genie-0.3.1.vsix
 artifacts/real-git-simulation-*.json
 artifacts/real-git-simulation-*.md
