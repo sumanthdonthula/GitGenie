@@ -11,28 +11,11 @@ You should not need to repeatedly pull main to discover whether someone touched 
 Review the overlap and click **Pull & Rebase** when ready. Genie fetches the selected remote base, usually `origin/main`, and rebases your current branch onto it. You do not have to check out or pull local main first.
 
 ```mermaid
-flowchart TD
-    code["Code on your feature branch"] --> watch["Genie fetches remote updates and checks your branch"]
-    watch --> overlap{"New overlapping changes?"}
-    overlap -->|No| code
-    overlap -->|Yes| alert["See affected files, lines and commit authors"]
-    alert --> review["Review Details and keep coding until ready"]
-    review --> code
-    code -->|Ready to sync| prepare["Save files and commit or stash edits"]
-    prepare --> syncAction["Click Pull & Rebase"]
-    syncAction --> checks{"Preflight checks pass?"}
-    checks -->|No| fix["Address the reported issue and retry"]
-    fix --> syncAction
-    checks -->|Yes| fetch["Fetch selected base and verify branch and HEAD"]
-    fetch --> backup["Back up HEAD and rebase your feature branch"]
-    backup --> conflict{"Rebase paused by conflicts?"}
-    conflict -->|No| synced["Branch includes the latest base"]
-    conflict -->|Yes| choice{"Continue or abort?"}
-    choice -->|Continue| resolve["Resolve files, stage changes and click Continue Rebase"]
-    resolve --> conflict
-    choice -->|Abort| restore["Click Abort Rebase to restore the starting branch"]
-    synced --> code
-    restore --> code
+flowchart LR
+    code["Code"] --> watch["Check overlaps"]
+    watch --> review["Review changes"]
+    review -->|When ready| sync["Commit or stash; Pull & Rebase"]
+    sync --> code
 ```
 
 ## Install in VS Code
@@ -83,23 +66,11 @@ Run **Git Genie: Enable Claude Reviews** to review detected pushes with your sig
 Enablement is a User/Remote machine setting, off by default. Automatic reviews watch the selected repository while VS Code is open; no-op pushes, tag-only pushes and missing remote-tracking reflogs are excluded. Configure `gitgenie.claude.docFolders` and optional HTTPS `gitgenie.claude.referenceUrls`. See the [full setup and limits](https://github.com/sumanthdonthula/GitGenie/blob/main/docs/CLAUDE-REVIEWS.md). Claude account usage/billing applies.
 
 ```mermaid
-flowchart TD
-    enable["Enable Claude reviews in a trusted workspace"] --> login["Use your installed, signed-in Claude Code CLI"]
-    login --> trigger{"How does the review start?"}
-    trigger -->|Automatic reviews enabled| baseline["Baseline the selected repository's remote-tracking reflogs"]
-    baseline --> push["Developer pushes from VS Code or a terminal"]
-    push --> detect{"New update-by-push entry detected?"}
-    detect -->|No| push
-    detect -->|Yes| queue["Queue a review of the pushed commit"]
-    trigger -->|Click Review with Claude| manual["Select committed HEAD for a manual review"]
-    queue --> context["Read bounded commit messages and diff at the reviewed commit"]
-    manual --> context
-    context --> docs["Read committed docs/git and contribution guidelines"]
-    docs --> references["Load optional configured HTTPS reference docs"]
-    references --> claude["Send context to Claude CLI with tools disabled"]
-    claude --> success{"Review succeeds?"}
-    success -->|Yes| report["View advisory suggestions, sources and context limits"]
-    success -->|No| error["Show an actionable error; retry manually when ready"]
-    error --> manual
-    report --> decide["Developer decides which follow-up changes to make"]
+flowchart LR
+    start["Push or manual review"] --> review["Claude reviews diff + guidelines"]
+    review --> suggestions{"Suggestions?"}
+    suggestions -->|No| keepCoding["Keep coding"]
+    suggestions -->|Yes| recommend["Review recommendations"]
 ```
+
+Automatic reviews run after a detected push, so the commits have already been shared. No suggestions means no follow-up is recommended. Suggestions are advisory and never block or undo a commit or push. A CLI or authentication failure means no review was completed; it does not mean the changes passed review.
