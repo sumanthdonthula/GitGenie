@@ -1,0 +1,13 @@
+Meet Git Genie, my Git companion inside VS Code.
+
+It watches my branch, flags when incoming changes touch the same files or lines, and shows who changed what before I sync.
+
+The lifecycle: code → detect overlap → review → commit or stash → Pull & Rebase → resolve if needed → keep building.
+
+Background monitoring keeps me informed. I choose when to rebase and handle any conflicts in VS Code.
+
+Fewer merge surprises. A little more magic.
+
+Try the VSIX: https://github.com/sumanthdonthula/GitGenie
+
+#Git #VSCode #DeveloperTools #OpenSource #GitGenie

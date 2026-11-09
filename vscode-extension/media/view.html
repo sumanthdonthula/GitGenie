@@ -93,6 +93,11 @@
         <div id="rebase-actions" class="actions" hidden><button id="continueRebase" class="primary">Continue Rebase</button><button id="abortRebase" class="secondary">Abort Rebase</button></div>
         <p id="sync-message" class="sync-message" role="status" aria-live="polite" hidden></p>
       </section>
+      <section class="advisor-section" aria-label="Claude Git suggestions">
+        <span class="eyebrow">GIT &amp; COMMIT SUGGESTIONS</span>
+        <p id="claude-status" class="sync-target" role="status" aria-live="polite">Optional reviews through your signed-in Claude CLI.</p>
+        <div class="actions"><button id="claudeReview" class="secondary">Review with Claude</button><button id="claudeShow" class="secondary" hidden>View suggestions</button></div>
+      </section>
       <button id="demo" class="demo-link">✧ &nbsp; See the genie in action</button>
     </section>
     <footer>

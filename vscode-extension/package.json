@@ -2,10 +2,15 @@
   "name": "git-genie",
   "displayName": "Git Genie — Your Git Companion",
   "description": "Rub the lamp. A little genie watches your local Git branch and warns when changes overlap.",
-  "version": "0.3.1",
-  "repository": { "type": "git", "url": "https://github.com/sumanthdonthula/GitGenie.git" },
+  "version": "0.4.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sumanthdonthula/GitGenie.git"
+  },
   "homepage": "https://github.com/sumanthdonthula/GitGenie#readme",
-  "bugs": { "url": "https://github.com/sumanthdonthula/GitGenie/issues" },
+  "bugs": {
+    "url": "https://github.com/sumanthdonthula/GitGenie/issues"
+  },
   "publisher": "gitgenie-local",
   "license": "MIT",
   "engines": {
@@ -36,9 +41,19 @@
   },
   "contributes": {
     "commands": [
-      { "command": "gitgenie.pullAndRebase", "title": "Git Genie: Pull & Rebase", "icon": "$(sync)" },
-      { "command": "gitgenie.continueRebase", "title": "Git Genie: Continue Rebase" },
-      { "command": "gitgenie.abortRebase", "title": "Git Genie: Abort Rebase" },
+      {
+        "command": "gitgenie.pullAndRebase",
+        "title": "Git Genie: Pull & Rebase",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "gitgenie.continueRebase",
+        "title": "Git Genie: Continue Rebase"
+      },
+      {
+        "command": "gitgenie.abortRebase",
+        "title": "Git Genie: Abort Rebase"
+      },
       {
         "command": "gitgenie.summon",
         "title": "Git Genie: Rub the Lamp",
@@ -60,6 +75,18 @@
       {
         "command": "gitgenie.chooseBase",
         "title": "Git Genie: Choose Comparison Branch"
+      },
+      {
+        "command": "gitgenie.enableClaude",
+        "title": "Git Genie: Enable Claude Reviews"
+      },
+      {
+        "command": "gitgenie.reviewWithClaude",
+        "title": "Git Genie: Review with Claude"
+      },
+      {
+        "command": "gitgenie.showClaudeSuggestions",
+        "title": "Git Genie: Show Claude Suggestions"
       }
     ],
     "viewsContainers": {
@@ -115,21 +142,73 @@
           "description": "Animate the lamp, smoke, and genie. System reduced-motion preferences are also respected."
         },
         "gitgenie.remote": {
-          "type": "string", "default": "origin", "scope": "resource",
+          "type": "string",
+          "default": "origin",
+          "scope": "resource",
           "description": "Default remote for background fetching and for comparison branches without a remote upstream."
         },
         "gitgenie.autoFetch": {
-          "type": "boolean", "default": true, "scope": "resource",
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
           "description": "Fetch the configured remote on startup and every 30 seconds. Fetching never rebases or changes your local branches."
+        },
+        "gitgenie.claude.enabled": {
+          "type": "boolean",
+          "default": false,
+          "scope": "machine",
+          "description": "Enable optional Claude reviews. Sends committed diffs, commit messages and Git guidelines through your signed-in Claude CLI. Uses your Claude plan or API billing. Requires a recent Claude CLI with --safe-mode support and a trusted workspace."
+        },
+        "gitgenie.claude.onPush": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "When Claude reviews are enabled, review successful pushes detected in remote-tracking reflogs while this repository is selected and VS Code is open. No-op pushes, tag-only pushes and pushes without remote-tracking reflogs are not detected."
+        },
+        "gitgenie.claude.command": {
+          "type": "string",
+          "default": "claude",
+          "scope": "machine",
+          "description": "Claude native executable path, or npm cli.js path. Shell commands, command arguments, .cmd, .bat and .ps1 wrappers are not supported. The default discovers Claude on PATH."
+        },
+        "gitgenie.claude.docFolders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "docs/git"
+          ],
+          "scope": "resource",
+          "description": "Repository-relative folders containing Git/commit guidelines. Reads committed .md, .txt, .rst and .adoc files at the reviewed commit. CONTRIBUTING and .gitmessage files are also included."
+        },
+        "gitgenie.claude.referenceUrls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "maxItems": 4,
+          "default": [],
+          "scope": "machine",
+          "description": "Optional HTTPS text or HTML reference documents to fetch for reviews (for example Git documentation). Cached for 24 hours. Redirects are not followed. Repository policies take precedence."
+        },
+        "gitgenie.claude.timeoutSeconds": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 300,
+          "default": 90,
+          "scope": "machine",
+          "description": "Maximum time to wait for each Claude CLI review."
         }
       }
     }
   },
   "scripts": {
-    "test": "node --test test/git.test.js test/sync.test.js",
+    "test": "node --test test/git.test.js test/sync.test.js test/advisor.test.js test/advisor-controller.test.js",
     "test:webview": "node test/webview.test.js",
     "test:host": "node test/run-host.js",
-    "package": "vsce package --out ../artifacts/git-genie-0.3.1.vsix"
+    "package": "vsce package --out ../artifacts/git-genie-0.4.0.vsix"
   },
   "devDependencies": {
     "@vscode/vsce": "^4.1.0",

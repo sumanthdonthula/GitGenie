@@ -6,6 +6,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const { Git, inspect, alertKey, demoSnapshot } = require('./git');
 const { syncPlan, pullAndRebase, resumeRebase, operationState, fetchRemote } = require('./sync');
+const { Advisor } = require('./advisor-controller');
 
 const VIEW = 'gitgenie.companion';
 const SCAN_MS = 10000;
@@ -27,6 +28,7 @@ class Companion {
     this.fetchInfo = { enabled: false, lastFetch: null, error: '' };
     this.fetchTimes = new Map();
     this.output = vscode.window.createOutputChannel('Git Genie');
+    this.advisor = new Advisor(this);
     this.status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 20);
     this.status.command = 'gitgenie.summon';
     this.status.name = 'Git Genie';
@@ -69,6 +71,9 @@ class Companion {
           case 'sync': await this.runSync('pull'); break;
           case 'continueRebase': await this.runSync('continue'); break;
           case 'abortRebase': await this.runSync('abort'); break;
+          case 'claudeEnable': await this.advisor.enable(); break;
+          case 'claudeReview': await this.advisor.request(); break;
+          case 'claudeShow': await this.advisor.show(); break;
         }
       } catch (error) { this.output.appendLine(error.message); }
     }));
@@ -81,6 +86,7 @@ class Companion {
     this.view?.webview.postMessage({
       type: 'state', ...this.state, animate,
       sync: this.sync, fetchInfo: this.fetchInfo,
+      advisor: this.advisor.state,
       animations: vscode.workspace.getConfiguration('gitgenie').get('animations', true), snoozed: Date.now() < this.snoozeUntil,
     });
   }
@@ -93,6 +99,7 @@ class Companion {
 
   demo() {
     if (this.operation) return;
+    this.advisor.reset();
     this.generation++;
     this.state = { mode: 'demo', snapshot: demoSnapshot() };
     this.status.text = '$(sparkle) Genie · demo';
@@ -140,6 +147,7 @@ class Companion {
     }
     const root = (await new Git(uri.fsPath).run(['rev-parse', '--show-toplevel'])).trim();
     this.repo = root;
+    this.advisor.reset();
     await this.context.workspaceState.update('repository', root);
     this.generation++;
     this.previousAlert = null;
@@ -204,6 +212,7 @@ class Companion {
       const snapshot = await inspect(repo, this.config().get('baseBranch', ''), remote);
       if (this.disposed || generation !== this.generation) return;
       this.repo = snapshot.root;
+      void this.advisor.poll();
       this.sync.paused = active?.kind === 'rebase';
       this.sync.canSync = false;
       this.sync.reason = '';
@@ -346,6 +355,8 @@ class Companion {
 
   dispose() {
     this.disposed = true;
+    this.advisor.dispose();
+    clearInterval(this.advisorTimer);
     clearInterval(this.timer);
     clearTimeout(this.saveTimer);
   }
@@ -363,12 +374,19 @@ async function activate(context) {
   command('gitgenie.pullAndRebase', () => companion.runSync('pull'));
   command('gitgenie.continueRebase', () => companion.runSync('continue'));
   command('gitgenie.abortRebase', () => companion.runSync('abort'));
+  command('gitgenie.enableClaude', () => companion.advisor.enable());
+  command('gitgenie.reviewWithClaude', () => companion.advisor.request());
+  command('gitgenie.showClaudeSuggestions', () => companion.advisor.show());
   context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(() => {
     clearTimeout(companion.saveTimer);
     companion.saveTimer = setTimeout(() => void companion.scan(), 400);
   }));
   context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
     if (event.affectsConfiguration('gitgenie')) {
+      if (event.affectsConfiguration('gitgenie.claude')) {
+        companion.advisor.configure();
+        void companion.advisor.poll();
+      }
       companion.generation++;
       companion.send();
       void companion.scan();
@@ -377,6 +395,7 @@ async function activate(context) {
   context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(() => {
     if (companion.operation) return;
     companion.repo = undefined;
+    companion.advisor.reset();
     companion.generation++;
     companion.previousAlert = null;
     companion.sync = { busy: false, canSync: false, target: null, paused: false, message: '', reason: '' };
@@ -386,12 +405,13 @@ async function activate(context) {
   }));
   context.subscriptions.push(vscode.workspace.onDidGrantWorkspaceTrust(() => void companion.scan()));
   companion.timer = setInterval(() => void companion.scan(), SCAN_MS);
+  companion.advisorTimer = setInterval(() => void companion.advisor.poll(), SCAN_MS);
   if (!context.globalState.get('welcomed.v0.2')) {
     await companion.reveal(true);
     await context.globalState.update('welcomed.v0.2', true);
   }
   void companion.scan();
-  return { getState: () => structuredClone({ ...companion.state, sync: companion.sync, fetchInfo: companion.fetchInfo }) };
+  return { getState: () => structuredClone({ ...companion.state, sync: companion.sync, fetchInfo: companion.fetchInfo, advisor: companion.advisor.state }) };
 }
 
 module.exports = { activate };

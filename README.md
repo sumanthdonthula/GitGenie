@@ -6,7 +6,7 @@
 
 Git Genie is an animated Git companion inside VS Code. A golden lamp lives in your Activity Bar; rub it and a genie appears through smoke with your branch status, latest commit, and a heads-up when a teammate changes the same files or lines.
 
-No AI service, Genie account, or Python installation is needed for the extension. It uses your existing Git installation and credentials.
+Core Git monitoring needs no AI service, Genie account, or Python installation. Optional Claude reviews use your existing signed-in Claude Code CLI to suggest Git and commit improvements after pushes.
 
 ## What is this?
 
@@ -31,7 +31,7 @@ It helps you stay aware, choose when to sync, and understand which files need at
 
 You need **VS Code 1.85+** and **Git 2.38+**. Existing Git authentication must work for remote fetches. This is a VSIX installation; the extension is not published on the Marketplace yet.
 
-1. Download [`git-genie-0.3.1.vsix`](artifacts/git-genie-0.3.1.vsix). On GitHub, use the file's **Download raw file** control.
+1. Download [`git-genie-0.4.0.vsix`](artifacts/git-genie-0.4.0.vsix). On GitHub, use the file's **Download raw file** control.
 2. Open VS Code and press **Ctrl+Shift+P** (or **Cmd+Shift+P** on macOS).
 3. Run **Extensions: Install from VSIX…** and select the downloaded file.
 4. If VS Code asks, run **Developer: Reload Window**.
@@ -40,7 +40,7 @@ You need **VS Code 1.85+** and **Git 2.38+**. Existing Git authentication must w
 From a local checkout, you can also double-click `Install-Extension.cmd` on Windows or run:
 
 ```powershell
-code --install-extension ./artifacts/git-genie-0.3.1.vsix
+code --install-extension ./artifacts/git-genie-0.4.0.vsix
 ```
 
 The companion opens on its first activation. You can summon it any time with **Git Genie: Rub the Lamp** from the Command Palette or **Genie** in the status bar. To put it on the right, right-click **Your Genie** and move the view to the **Secondary Side Bar**.
@@ -70,6 +70,12 @@ You do not need to check out or update local main first. For example, with `feat
 If Git reports conflicts, the rebase pauses. Resolve the files in VS Code's Source Control view, stage the resolutions, and click **Continue Rebase**. Or click **Abort Rebase** to restore the pre-rebase branch. Rebase details and the backup reference appear in **Output → Git Genie**. These controls also detect a rebase paused outside Genie.
 
 Rebasing can change local commit IDs. Genie does not push, force-push, auto-resolve conflicts, or discard your edits. [Git's rebase documentation](https://git-scm.com/docs/git-rebase) explains the underlying operation.
+
+## Claude suggestions after pushes
+
+Enable **Claude reviews** in the companion or run **Git Genie: Enable Claude Reviews**. With a recent, signed-in Claude CLI, Genie reads committed `docs/git/` and contribution guidelines, then reviews detected pushes for Git practices, commit messages, and useful follow-up changes. Reports cite their sources; suggestions are advisory. You can also run **Git Genie: Review with Claude** manually.
+
+This is opt-in: committed diffs, messages and guidelines are sent through your Claude account and use its plan/API billing. Optional HTTPS reference documents are configured in User settings. Push detection watches the selected repository's remote-tracking reflogs while VS Code is open; no-op and tag-only pushes are excluded. See [setup, settings and limits](docs/CLAUDE-REVIEWS.md).
 
 ## Controls and preferences
 
@@ -115,7 +121,7 @@ npm test
 npm run package
 ```
 
-The package is written to `artifacts/git-genie-0.3.1.vsix` in the repository root. Runtime code uses only VS Code and Node built-ins; npm dependencies are development tools. Open the root project and launch **Git Genie Extension** from Run and Debug for an Extension Development Host.
+The package is written to `artifacts/git-genie-0.4.0.vsix` in the repository root. Runtime code uses only VS Code and Node built-ins; npm dependencies are development tools. Open the root project and launch **Git Genie Extension** from Run and Debug for an Extension Development Host.
 
 Additional checks are available with `npm run test:webview` and `npm run test:host`. The UI harnesses currently use locally installed Chrome and VS Code on Windows. Git integration tests use disposable repositories and local bare remotes, including successful sync, dirty-tree rejection, conflict continuation/abort, and failed fetches.
 

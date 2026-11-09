@@ -57,6 +57,16 @@ async function main() {
     assert.ok(await page.evaluate(() => window.__messages.some(m => m.type === 'sync')));
     assert.match(await page.locator('#watch-status').innerText(), /fetch every 30s/);
     assert.match(await page.locator('#sync-target').innerText(), /origin\/main/);
+    await page.locator('#claudeReview').click();
+    assert.ok(await page.evaluate(() => window.__messages.some(m => m.type === 'claudeEnable')));
+    await page.evaluate(state => window.postMessage(state, '*'), { ...live, advisor: { enabled: true, message: '<img src=x onerror=alert(1)>', report: { text: 'advice' } } });
+    await page.getByText('<img src=x onerror=alert(1)>', { exact: true }).waitFor();
+    assert.equal(await page.locator('#claude-status img').count(), 0);
+    await page.locator('#claudeReview').click();
+    await page.locator('#claudeShow').click();
+    assert.ok(await page.evaluate(() => window.__messages.some(m => m.type === 'claudeReview') && window.__messages.some(m => m.type === 'claudeShow')));
+    await page.evaluate(state => window.postMessage(state, '*'), { ...live, advisor: { enabled: true, busy: true } });
+    await page.waitForFunction(() => document.getElementById('claudeReview').disabled);
     await page.evaluate(state => window.postMessage(state, '*'), { ...live, sync: { ...live.sync, busy: true } });
     await page.waitForFunction(() => document.getElementById('sync').disabled);
     assert.equal(await page.locator('#sync').isDisabled(), true);

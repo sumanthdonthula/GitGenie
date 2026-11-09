@@ -77,6 +77,9 @@ body.has-overlap .assessment-icon { color: var(--gold); }
 .secondary { color: var(--ink); background: transparent; border: 1px solid var(--line); }
 .secondary:hover { background: #a98aca12; }
 .sync-section { margin-top: 9px; }
+.advisor-section { margin-top: 15px; padding-top: 13px; border-top: 1px solid var(--line); }
+.advisor-section .actions { flex-wrap: wrap; margin-top: 9px; }
+.advisor-section button { overflow-wrap: anywhere; }
 .sync-button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 12px; border: 1px solid #c9a15c66; background: #dab56c0d; color: var(--ink); border-radius: 5px; font-size: 11px; font-weight: 600; }
 .sync-button:hover:not(:disabled) { background: #dab56c21; border-color: var(--gold); }
 .sync-button span { color: var(--gold); font-size: 16px; }

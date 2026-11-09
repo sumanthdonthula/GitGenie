@@ -62,7 +62,35 @@ async function run() {
   assert.equal(api.getState().mode, 'demo');
   await vscode.commands.executeCommand('gitgenie.refresh');
   await until(() => api.getState().mode === 'watching', 'return from demo');
-  console.log('Extension host passed: automatic fetch, real analysis, Pull & Rebase conflict, abort, resolved continuation, summon, and demo.');
+  assert.equal(api.getState().advisor.enabled, false, 'Claude must be opt-in');
+  const fakeClaude = path.join(path.dirname(repo), 'fake-claude.js');
+  await fs.writeFile(fakeClaude, `let input=''; process.stdin.on('data', c=>input+=c); process.stdin.on('end',()=>{
+    const context=JSON.parse(input);
+    const sources=context.docs.map(d=>d.path).join(', ');
+    process.stdout.write(JSON.stringify({type:'result',result:'Review of '+context.sha+'; sources: '+sources}));
+  });`);
+  const config = vscode.workspace.getConfiguration('gitgenie');
+  await config.update('claude.command', fakeClaude, vscode.ConfigurationTarget.Global);
+  await fs.mkdir(path.join(repo, 'docs', 'git'), { recursive: true });
+  await fs.writeFile(path.join(repo, 'docs', 'git', 'commits.md'), 'Use concise imperative subjects.');
+  await git.run(['add', 'docs/git/commits.md']);
+  await git.run(['commit', '-m', 'docs: add commit guidelines']);
+  await vscode.commands.executeCommand('gitgenie.enableClaude');
+  await vscode.commands.executeCommand('gitgenie.reviewWithClaude');
+  assert.ok(api.getState().advisor.report, JSON.stringify(api.getState().advisor));
+  assert.match(api.getState().advisor.report.text, /docs\/git\/commits.md/);
+  const beforePush = api.getState().advisor.report.sha;
+  await fs.writeFile(path.join(repo, 'follow-up.txt'), 'A focused follow-up change.');
+  await git.run(['add', 'follow-up.txt']); await git.run(['commit', '-m', 'feat: follow up']);
+  const pushed = (await git.run(['rev-parse', 'HEAD'])).trim();
+  assert.notEqual(pushed, beforePush);
+  await git.run(['push', '-u', 'origin', 'HEAD']);
+  await until(() => api.getState().advisor.report?.sha === pushed, 'automatic Claude review of real push', 40000);
+  assert.match(api.getState().advisor.report.ref, /refs\/remotes\/origin/);
+  await vscode.commands.executeCommand('gitgenie.showClaudeSuggestions');
+  assert.match(vscode.window.activeTextEditor.document.getText(), /CLAUDE SUGGESTIONS/);
+  await config.update('claude.enabled', false, vscode.ConfigurationTarget.Global);
+  console.log('Extension host passed: Git sync/recovery, opt-in Claude manual and automatic push reviews, committed guidelines, and report view. Claude was simulated; no paid calls made.');
 }
 
 module.exports = { run };

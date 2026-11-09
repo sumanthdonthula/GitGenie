@@ -78,6 +78,12 @@ function render(state) {
   byId('continueRebase').disabled = sync.busy;
   byId('abortRebase').disabled = sync.busy;
   text('sync-message', demo ? '' : sync.message || '');
+  const advisor = state.advisor || {};
+  text('claude-status', demo ? 'Claude reviews are available in your real repository.' : advisor.message || 'Optional reviews through your signed-in Claude CLI.');
+  text('claudeReview', advisor.busy ? 'Reviewing…' : advisor.enabled ? 'Review with Claude' : 'Enable Claude reviews');
+  byId('claudeReview').disabled = demo || advisor.busy || sync.busy;
+  byId('claudeReview').onclick = () => send(advisor.enabled ? 'claudeReview' : 'claudeEnable');
+  byId('claudeShow').hidden = demo || !advisor.report;
   byId('sync-message').hidden = demo || !sync.message;
   for (const id of ['refresh', 'repository', 'base', 'demo']) byId(id).disabled = Boolean(sync.busy);
   text('snooze', state.snoozed ? 'Resume' : 'Snooze');
@@ -90,7 +96,7 @@ function render(state) {
   if (state.animate) summon();
 }
 
-for (const type of ['refresh', 'details', 'demo', 'repository', 'base', 'sync', 'continueRebase', 'abortRebase']) {
+for (const type of ['refresh', 'details', 'demo', 'repository', 'base', 'sync', 'continueRebase', 'abortRebase', 'claudeShow']) {
   byId(type).addEventListener('click', () => send(type));
 }
 byId('lamp').addEventListener('click', () => { summon(); send('summon'); });
